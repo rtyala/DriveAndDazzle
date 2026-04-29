@@ -9,6 +9,11 @@ public class PlayerController : MonoBehaviour
     public Transform leftKneePos;
     public Transform rightKneePos;
     public float moveSpeed = 20f;
+    public GameObject dashboardUI;
+    public GameObject kneesUI;
+    public RectTransform kneesRect;
+    public float zoomAmount = 1.8f;
+    public float kneeShiftAmount = 400f;
     private Transform targetTransform;
     private Transform currentLane;
 
@@ -24,6 +29,23 @@ public class PlayerController : MonoBehaviour
         if (targetTransform == null) return;
         transform.position = Vector3.Lerp(transform.position, targetTransform.position, Time.deltaTime * moveSpeed);
         transform.rotation = Quaternion.Lerp(transform.rotation, targetTransform.rotation, Time.deltaTime * moveSpeed);
+        bool isLookingDown = (targetTransform == centerKneesPos || targetTransform == leftKneePos || targetTransform == rightKneePos);
+        bool isZoomedKnee = (targetTransform == leftKneePos || targetTransform == rightKneePos);
+        if (dashboardUI != null) dashboardUI.SetActive(!isLookingDown);
+        if (kneesUI != null) kneesUI.SetActive(isLookingDown);
+        if (kneesRect != null)
+        {
+            float targetScale = isZoomedKnee ? zoomAmount : 1f;
+            float targetX = 0f;
+            if (isLookingDown)
+            {
+                if (targetTransform == leftKneePos) targetX = kneeShiftAmount;
+                else if (targetTransform == rightKneePos) targetX = -kneeShiftAmount;
+            }
+            kneesRect.localScale = Vector3.Lerp(kneesRect.localScale, new Vector3(targetScale, targetScale, 1f), Time.deltaTime * moveSpeed);
+            Vector2 targetPos = new Vector2(targetX, kneesRect.anchoredPosition.y);
+            kneesRect.anchoredPosition = Vector2.Lerp(kneesRect.anchoredPosition, targetPos, Time.deltaTime * moveSpeed);
+        }
     }
 
     void HandleInputs()
@@ -38,7 +60,6 @@ public class PlayerController : MonoBehaviour
         {
             if (pressLeft) targetTransform = leftLanePos;
             if (pressRight) targetTransform = rightLanePos;
-
             if (pressDown)
             {
                 currentLane = targetTransform;
