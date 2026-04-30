@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,19 +9,25 @@ public class PlayerController : MonoBehaviour
     public Transform centerKneesPos;
     public Transform leftKneePos;
     public Transform rightKneePos;
-    public float moveSpeed = 20f;
+    private float moveSpeed = 20f;
     public GameObject dashboardUI;
     public GameObject kneesUI;
     public RectTransform kneesRect;
-    public float zoomAmount = 1.8f;
-    public float kneeShiftAmount = 400f;
+    public CanvasGroup blinkCanvasGroup;
+    public float blinkDuration = 0.08f;
+    public Vector2 blinkInterval = new Vector2(3f, 10f);
+    private float zoomAmount = 2.9f;
+    private float kneeShiftAmount = 750f;
     private Transform targetTransform;
     private Transform currentLane;
+    private float nextBlinkTime;
+    private Coroutine currentBlinkCoroutine;
 
     void Start()
     {
         currentLane = rightLanePos;
         targetTransform = currentLane;
+        nextBlinkTime = Time.time + Random.Range(blinkInterval.x, blinkInterval.y);
     }
 
     void Update()
@@ -46,6 +53,11 @@ public class PlayerController : MonoBehaviour
             Vector2 targetPos = new Vector2(targetX, kneesRect.anchoredPosition.y);
             kneesRect.anchoredPosition = Vector2.Lerp(kneesRect.anchoredPosition, targetPos, Time.deltaTime * moveSpeed);
         }
+        if (Time.time >= nextBlinkTime)
+        {
+            TriggerBlink();
+            nextBlinkTime = Time.time + Random.Range(blinkInterval.x, blinkInterval.y);
+        }
     }
 
     void HandleInputs()
@@ -56,6 +68,11 @@ public class PlayerController : MonoBehaviour
         bool pressDown = keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame;
         bool pressLeft = keyboard.aKey.wasPressedThisFrame || keyboard.leftArrowKey.wasPressedThisFrame;
         bool pressRight = keyboard.dKey.wasPressedThisFrame || keyboard.rightArrowKey.wasPressedThisFrame;
+        if (pressUp || pressDown)
+        {
+            TriggerBlink();
+        }
+
         if (targetTransform == rightLanePos || targetTransform == leftLanePos)
         {
             if (pressLeft) targetTransform = leftLanePos;
@@ -72,6 +89,35 @@ public class PlayerController : MonoBehaviour
             if (pressLeft) targetTransform = leftKneePos;
             if (pressRight) targetTransform = rightKneePos;
             if (pressDown) targetTransform = centerKneesPos;
+        }
+    }
+
+    public void TriggerBlink()
+    {
+        if (blinkCanvasGroup == null) return;
+
+        if (currentBlinkCoroutine != null)
+            StopCoroutine(currentBlinkCoroutine);
+
+        currentBlinkCoroutine = StartCoroutine(DoBlink());
+    }
+
+    IEnumerator DoBlink()
+    {
+        float elapsed = 0;
+        while (elapsed < blinkDuration)
+        {
+            elapsed += Time.deltaTime;
+            blinkCanvasGroup.alpha = Mathf.Lerp(0, 1, elapsed / blinkDuration);
+            yield return null;
+        }
+        yield return new WaitForSeconds(0.02f);
+        elapsed = 0;
+        while (elapsed < blinkDuration)
+        {
+            elapsed += Time.deltaTime;
+            blinkCanvasGroup.alpha = Mathf.Lerp(1, 0, elapsed / blinkDuration);
+            yield return null;
         }
     }
 }
