@@ -238,7 +238,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 2125970963113852067, guid: 877844e4f2d7af943b05ccb1a7dff571, type: 3}
   poolSize: 5
-  spawnInterval: 10
+  spawnInterval: 8
   leftLane: {fileID: 396965808}
   rightLane: {fileID: 1747453398}
 --- !u!4 &137027443

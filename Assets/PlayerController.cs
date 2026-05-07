@@ -8,7 +8,9 @@ public class PlayerController : MonoBehaviour
     public Transform leftLanePos;
     public Transform centerKneesPos;
     public Transform leftKneePos;
-    public Transform rightKneePos;
+    public Transform rightKneePos; 
+    public Transform phantomHitbox;
+
     private float moveSpeed = 20f;
     public GameObject dashboardUI;
     public GameObject kneesUI;
@@ -80,6 +82,17 @@ public class PlayerController : MonoBehaviour
         {
             TriggerBlink();
             nextBlinkTime = Time.time + Random.Range(blinkInterval.x, blinkInterval.y);
+        }
+
+        // --- ÀŒ√» ¿ ƒ¬»∆≈Õ»ﬂ Õ≈¬»ƒ»ÃŒ√Œ ¡¿Ãœ≈–¿ ---
+        if (phantomHitbox != null && currentLane != null)
+        {
+
+            float targetHitboxX = isLookingDown ? currentLane.position.x : targetTransform.position.x;
+
+            Vector3 targetHitboxPos = new Vector3(targetHitboxX, phantomHitbox.position.y, phantomHitbox.position.z);
+
+            phantomHitbox.position = Vector3.Lerp(phantomHitbox.position, targetHitboxPos, Time.deltaTime * moveSpeed);
         }
     }
 
