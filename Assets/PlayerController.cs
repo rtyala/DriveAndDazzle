@@ -37,6 +37,8 @@ public class PlayerController : MonoBehaviour
     private Coroutine currentBlinkCoroutine;
     private float currentWheelAngle = 0f;
 
+    public TexturePainter handPainter;
+
     void Start()
     {
         currentLane = rightLanePos;
@@ -64,6 +66,10 @@ public class PlayerController : MonoBehaviour
         if (kneesRect != null)
         {
             bool isZoomedKnee = (targetTransform == leftKneePos || targetTransform == rightKneePos);
+            if (handPainter != null)
+            {
+                handPainter.isLookingAtHand = isZoomedKnee;
+            }
             float targetScale = isZoomedKnee ? zoomAmount : 1f;
             float targetX = 0f;
 
@@ -84,7 +90,6 @@ public class PlayerController : MonoBehaviour
             nextBlinkTime = Time.time + Random.Range(blinkInterval.x, blinkInterval.y);
         }
 
-        // --- ÀŒ√» ¿ ƒ¬»∆≈Õ»ﬂ Õ≈¬»ƒ»ÃŒ√Œ ¡¿Ãœ≈–¿ ---
         if (phantomHitbox != null && currentLane != null)
         {
 
@@ -103,18 +108,15 @@ public class PlayerController : MonoBehaviour
         bool isRightZoom = (targetTransform == rightKneePos);
         rightHandBrush.SetActive(isLeftZoom);
         leftHandBrush.SetActive(isRightZoom);
-        float targetScale = (isLeftZoom || isRightZoom) ? zoomAmount : 1f;
         if (isLeftZoom)
         {
             RectTransform rt = rightHandBrush.GetComponent<RectTransform>();
             HandleHandMovement(rt);
-            rt.localScale = Vector3.Lerp(rt.localScale, new Vector3(targetScale, targetScale, 1f), Time.deltaTime * moveSpeed);
         }
         if (isRightZoom)
         {
             RectTransform rt = leftHandBrush.GetComponent<RectTransform>();
             HandleHandMovement(rt);
-            rt.localScale = Vector3.Lerp(rt.localScale, new Vector3(targetScale, targetScale, 1f), Time.deltaTime * moveSpeed);
         }
     }
 
