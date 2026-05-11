@@ -4,49 +4,64 @@ using System.Collections.Generic;
 public class EndlessRoadGenerator : MonoBehaviour
 {
     [Header("Префабы")]
-    public GameObject roadSegmentPrefab;   // Твой готовый префаб RoadSegment
+    public GameObject roadSegmentPrefab;
 
     [Header("Настройки")]
-    public int poolSize = 4;               // Количество сегментов в пуле
-    public float segmentLength = 20f;      // Длина твоего сегмента
-    public float deleteDistance = -40f;    // На каком Z удалять
+    public float segmentLength = 200f;
+    public int segmentsInReserve = 5;
+    public float deleteThresholdZ = -150f;
 
     private List<GameObject> segments = new List<GameObject>();
-    private float nextSpawnZ = 0f;
+    private float nextLocalZ;
 
     void Start()
     {
-        for (int i = 0; i < poolSize; i++)
+        // ЧТОБЫ КАМЕРА ВИДЕЛА ДОРОГУ СРАЗУ:
+        // Начинаем спавн с Z = -200 (или -segmentLength), 
+        // чтобы первый сегмент уже лежал под камерой и впереди неё.
+        nextLocalZ = -segmentLength + (segmentLength / 2f);
+
+        for (int i = 0; i < segmentsInReserve; i++)
         {
-            CreateSegment(nextSpawnZ);
-            nextSpawnZ += segmentLength;
+            CreateSegment();
         }
     }
 
     void Update()
     {
-        // Удаляем старые сегменты
-        for (int i = segments.Count - 1; i >= 0; i--)
+        // 1. Удаление
+        if (segments.Count > 0)
         {
-            if (segments[i].transform.position.z < deleteDistance)
+            if (segments[0].transform.position.z < deleteThresholdZ)
             {
-                Destroy(segments[i]);
-                segments.RemoveAt(i);
+                GameObject old = segments[0];
+                segments.RemoveAt(0);
+                Destroy(old);
             }
         }
 
-        // Создаём новые
-        if (segments.Count < poolSize)
+        // 2. Восполнение запаса
+        while (segments.Count < segmentsInReserve)
         {
-            CreateSegment(nextSpawnZ);
-            nextSpawnZ += segmentLength;
+            CreateSegment();
         }
     }
 
-    void CreateSegment(float zPosition)
+    void CreateSegment()
     {
-        GameObject newSegment = Instantiate(roadSegmentPrefab, new Vector3(0, -0.5f, zPosition), Quaternion.identity);
-        newSegment.transform.parent = this.transform;
+        if (roadSegmentPrefab == null) return;
+
+        GameObject newSegment = Instantiate(roadSegmentPrefab);
+        newSegment.transform.SetParent(this.transform.parent);
+
+        // Устанавливаем локальную позицию
+        newSegment.transform.localPosition = new Vector3(0, -0.5f, nextLocalZ);
+
+        newSegment.transform.localScale = roadSegmentPrefab.transform.localScale;
+        newSegment.transform.localRotation = Quaternion.identity;
+
         segments.Add(newSegment);
+
+        nextLocalZ += segmentLength;
     }
 }

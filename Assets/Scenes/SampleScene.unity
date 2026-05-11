@@ -1010,6 +1010,76 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 40, y: -20, z: 0}
+--- !u!1 &714317449
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 714317450}
+  - component: {fileID: 714317451}
+  m_Layer: 0
+  m_Name: WorldHouseSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &714317450
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714317449}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 972855774}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &714317451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714317449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd225ce1327751848a66c854ab3cad61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WorldHouseManager
+  buildingPrefabs:
+  - {fileID: 6913838050020503594, guid: b8b48fd9575c34dde9410dee78a4ff72, type: 3}
+  - {fileID: 919132149155446097, guid: 034d202d1fb7849f3b2388381474f4a7, type: 3}
+  - {fileID: 1700152209450413462, guid: 5426e7f86b5b74ec0a38dd992399a5b0, type: 3}
+  - {fileID: 919132149155446097, guid: 1deb632ee430247c6b2c9bb92b4ca464, type: 3}
+  - {fileID: 5720013252100257546, guid: c003e24639b7949cf8abbaaf6ba7f4c5, type: 3}
+  - {fileID: 9060964938156956912, guid: 9e7280d5e34184239966f48cfe7539ab, type: 3}
+  - {fileID: 919132149155446097, guid: b2844ffdf75974ca4992a07a20376a0e, type: 3}
+  treePrefabs:
+  - {fileID: 128322510527707026, guid: 9efb2638cadf04a7d9f711b8a141df62, type: 3}
+  - {fileID: 919132149155446097, guid: ad9ae33334e9a49bcb1b9e0f71d183c7, type: 3}
+  - {fileID: 2733267861507776817, guid: 42e9cad8fa0c145f6a5d249272c0b5a1, type: 3}
+  grassPrefabs:
+  - {fileID: 0}
+  roadLeft: -3
+  roadRight: 3
+  grassFieldLeft: -25
+  grassFieldRight: 25
+  grassStep: 2
+  grassRandomOffset: 0.5
+  leftBuildingsX: -14.5
+  rightBuildingsX: 14.5
+  minGapBetweenObjects: 3
+  maxObjectsPerSide: 150
+  treeChance: 0.4
+  grassChance: 0
 --- !u!1 &794534194
 GameObject:
   m_ObjectHideFlags: 0
@@ -1213,6 +1283,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 175711800}
+  - {fileID: 714317450}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &973360419
