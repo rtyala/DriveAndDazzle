@@ -301,9 +301,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   roadSegmentPrefab: {fileID: 1736198972860355478, guid: 7119d75dca494cc4e97f3d452c841a9c, type: 3}
-  poolSize: 6
-  segmentLength: 20
-  deleteDistance: -60
+  segmentLength: 200
+  segmentsInReserve: 5
+  deleteThresholdZ: -450
 --- !u!1 &200057991
 GameObject:
   m_ObjectHideFlags: 0
@@ -1066,20 +1066,13 @@ MonoBehaviour:
   - {fileID: 128322510527707026, guid: 9efb2638cadf04a7d9f711b8a141df62, type: 3}
   - {fileID: 919132149155446097, guid: ad9ae33334e9a49bcb1b9e0f71d183c7, type: 3}
   - {fileID: 2733267861507776817, guid: 42e9cad8fa0c145f6a5d249272c0b5a1, type: 3}
-  grassPrefabs:
-  - {fileID: 0}
-  roadLeft: -3
-  roadRight: 3
-  grassFieldLeft: -25
-  grassFieldRight: 25
-  grassStep: 2
-  grassRandomOffset: 0.5
-  leftBuildingsX: -14.5
-  rightBuildingsX: 14.5
-  minGapBetweenObjects: 3
-  maxObjectsPerSide: 150
+  leftX: -34
+  rightX: 34
+  gapBetweenObjects: 5
   treeChance: 0.4
-  grassChance: 0
+  generationAheadDistance: 250
+  deleteBehindDistance: 100
+  worldSpeed: 30
 --- !u!1 &794534194
 GameObject:
   m_ObjectHideFlags: 0
