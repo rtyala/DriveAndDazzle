@@ -18,6 +18,8 @@ public class TexturePainter : MonoBehaviour, IPointerDownHandler, IDragHandler, 
 
     public float penaltyPoints = 0;
 
+    private float initialPenalty;
+
     void Start()
     {
         rawImage = GetComponent<RawImage>();
@@ -41,6 +43,7 @@ public class TexturePainter : MonoBehaviour, IPointerDownHandler, IDragHandler, 
             if (c.grayscale > 0.9f) nailPixelsCount++;
         }
         penaltyPoints = nailPixelsCount * 0.001f;
+        initialPenalty = penaltyPoints;
         Debug.Log("Стартовый штраф: " + penaltyPoints);
     }
 
@@ -132,11 +135,28 @@ public class TexturePainter : MonoBehaviour, IPointerDownHandler, IDragHandler, 
         {
             penaltyPoints -= 0.001f;
         }
+        if (penaltyPoints < 0) penaltyPoints = 0;
         else
         {
-            penaltyPoints += 0.001f;
+            penaltyPoints += 0.00008f;
         }
         drawTexture.SetPixel(x, y, paintColor);
         needsApply = true;
+    }
+
+    public float GetSuccessPercentage()
+    {
+        if (initialPenalty <= 0) return 0f;
+        float ratio = Mathf.Clamp01(1f - (penaltyPoints / initialPenalty));
+        return ratio * 100f;
+    }
+
+    public void TransferTextureToFinalScreen(RawImage targetRawImage)
+    {
+        if (targetRawImage != null && drawTexture != null)
+        {
+            drawTexture.Apply();
+            targetRawImage.texture = drawTexture;
+        }
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,9 +15,9 @@ public class GameManager : MonoBehaviour
     public float timeLimit = 600f;
     public static bool isGameOver = false;
 
-    [Header("Текстовые компоненты (выберите один)")]
-    public Text timerTextLegacy;      // для старого UI Text
-    public TMP_Text timerTextTMP;     // для TextMeshPro
+    [Header("Текстовые компоненты")]
+    public Text timerTextLegacy;
+    public TMP_Text timerTextTMP;
 
     [Header("Аудио настройки")]
     public AudioSource lobbySource;
@@ -25,6 +26,12 @@ public class GameManager : MonoBehaviour
 
     public AudioClip[] radioPlaylist;
     private int currentTrackIndex = 0;
+
+    public TexturePainter texturePainter;
+    public RawImage finalHandsImage;
+    public Image diagramFillImage;
+    public TMP_Text percentTextUI;
+
 
     void Start()
     {
@@ -124,9 +131,50 @@ public class GameManager : MonoBehaviour
 
         HideTimerText();
 
+        if (texturePainter != null && finalHandsImage != null)
+        {
+            texturePainter.TransferTextureToFinalScreen(finalHandsImage);
+        }
+
         if (gameOverScreenUI != null)
         {
             gameOverScreenUI.SetActive(true);
+            float finalAccuracy = 0f;
+            if (texturePainter != null)
+            {
+                finalAccuracy = texturePainter.GetSuccessPercentage();
+            }
+            StartCoroutine(AnimateDiagram(finalAccuracy));
+        }
+    }
+
+    private IEnumerator AnimateDiagram(float targetPercent)
+    {
+        targetPercent = Mathf.Clamp(targetPercent, 0f, 100f);
+        if (diagramFillImage != null) diagramFillImage.fillAmount = 0f;
+        if (percentTextUI != null) percentTextUI.text = "0%";
+
+        float currentPercent = 0f;
+        float animationSpeed = 50f;
+
+        while (currentPercent < targetPercent)
+        {
+            currentPercent += animationSpeed * Time.unscaledDeltaTime;
+
+            if (currentPercent > targetPercent)
+                currentPercent = targetPercent;
+
+            if (diagramFillImage != null)
+            {
+                diagramFillImage.fillAmount = currentPercent / 100f;
+            }
+
+            if (percentTextUI != null)
+            {
+                percentTextUI.text = Mathf.RoundToInt(currentPercent).ToString() + "%";
+            }
+
+            yield return null;
         }
     }
 
