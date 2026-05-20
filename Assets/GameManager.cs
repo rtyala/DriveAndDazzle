@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class GameManager : MonoBehaviour
 
     [Header("Финальный экран")]
     public GameObject gameOverScreenUI;
+
+    [Header("Экран аварии")]
+    public GameObject gameFastOverScreenUI;
 
     [Header("Настройки времени")]
     public float timeLimit = 600f;
@@ -35,6 +39,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        if (gameFastOverScreenUI != null) 
+            gameFastOverScreenUI.SetActive(false);
+
         isGameOver = false;
 
         Time.timeScale = 0f;
@@ -187,6 +194,55 @@ public class GameManager : MonoBehaviour
         else if (timerTextTMP != null && timerTextTMP.gameObject != null)
         {
             timerTextTMP.gameObject.SetActive(false);
+        }
+    }
+
+    public void GameOver()
+    {
+        if (isGameOver) return;
+
+        isGameOver = true;
+        Time.timeScale = 0f;
+
+        if (backgroundSource != null && backgroundSource.isPlaying) backgroundSource.Stop();
+        if (radioSource != null && radioSource.isPlaying) radioSource.Stop();
+
+        HideTimerText();
+
+        if (gameOverScreenUI != null)
+        {
+            gameOverScreenUI.SetActive(true);
+
+            float currentAccuracy = 0f;
+            if (texturePainter != null)
+            {
+                texturePainter.TransferTextureToFinalScreen(finalHandsImage);
+                currentAccuracy = texturePainter.GetSuccessPercentage();
+            }
+            StartCoroutine(AnimateDiagram(currentAccuracy));
+        }
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void FastGameOver()
+    {
+        if (isGameOver) return;
+        isGameOver = true;
+        Time.timeScale = 0f;
+
+        if (backgroundSource != null) backgroundSource.Stop();
+        if (radioSource != null) radioSource.Stop();
+
+        HideTimerText();
+
+        if (gameFastOverScreenUI != null)
+        {
+            gameFastOverScreenUI.SetActive(true);
         }
     }
 }
