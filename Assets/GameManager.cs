@@ -31,15 +31,26 @@ public class GameManager : MonoBehaviour
     public AudioClip[] radioPlaylist;
     private int currentTrackIndex = 0;
 
+    [Header("Ссылки для Результатов")]
     public TexturePainter texturePainter;
     public RawImage finalHandsImage;
     public Image diagramFillImage;
     public TMP_Text percentTextUI;
 
+    [Header("Элементы Финала и Свиданий")]
+    [Tooltip("Порог процентов для победы (например, 70)")]
+    public float requiredSuccessPercent = 70f;
+    public Button goToDateButton; // Вторая кнопка ("На свидание")
+    public TMP_Text winLoseText; // Текст "Ура вы выиграли" / "Увы вы не успели"
+
+    [Header("Экран Свидания (Новая логика)")]
+    public GameObject dateScreenUI; // Экран свидания, который включается кнопкой
+    public Image finalDateCandidateImage; // Компонент Image на экране свидания, куда встанет мужичок
+    public Sprite[] manSprites; // Массив из 5 картинок красивых мужчин
 
     void Start()
     {
-        if (gameFastOverScreenUI != null) 
+        if (gameFastOverScreenUI != null)
             gameFastOverScreenUI.SetActive(false);
 
         isGameOver = false;
@@ -49,6 +60,13 @@ public class GameManager : MonoBehaviour
 
         if (gameOverScreenUI != null)
             gameOverScreenUI.SetActive(false);
+
+        if (dateScreenUI != null)
+            dateScreenUI.SetActive(false);
+
+        // Изначально кнопка свидания отключена и текст пустой
+        if (goToDateButton != null) goToDateButton.interactable = false;
+        if (winLoseText != null) winLoseText.text = "";
 
         if (lobbySource != null)
             lobbySource.Play();
@@ -115,13 +133,9 @@ public class GameManager : MonoBehaviour
     void SetTimerText(string text)
     {
         if (timerTextLegacy != null)
-        {
             timerTextLegacy.text = text;
-        }
         else if (timerTextTMP != null)
-        {
             timerTextTMP.text = text;
-        }
     }
 
     void FinishGame()
@@ -172,55 +186,60 @@ public class GameManager : MonoBehaviour
                 currentPercent = targetPercent;
 
             if (diagramFillImage != null)
-            {
                 diagramFillImage.fillAmount = currentPercent / 100f;
-            }
 
             if (percentTextUI != null)
-            {
                 percentTextUI.text = Mathf.RoundToInt(currentPercent).ToString() + "%";
-            }
 
             yield return null;
         }
+
+        CheckWinLoseConditions(targetPercent);
+    }
+
+    private void CheckWinLoseConditions(float finalPercent)
+    {
+        if (finalPercent >= requiredSuccessPercent)
+        {
+            if (winLoseText != null) winLoseText.text = "Ура вы выиграли";
+            if (goToDateButton != null) goToDateButton.interactable = true;
+        }
+        else
+        {
+            if (winLoseText != null) winLoseText.text = "Увы вы не успели";
+            if (goToDateButton != null) goToDateButton.interactable = false;
+        }
+    }
+
+    // МЕТОД ДЛЯ КНОПКИ "НА СВИДАНИЕ" (Выбирает мужичка сам!)
+    public void OpenDateScreen()
+    {
+        if (manSprites != null && manSprites.Length > 0 && finalDateCandidateImage != null)
+        {
+            // Сама программа выбирает случайный индекс от 0 до длины массива
+            int randomIndex = Random.Range(0, manSprites.Length);
+
+            // Подставляем выбранную картинку на экран свидания
+            finalDateCandidateImage.sprite = manSprites[randomIndex];
+        }
+
+        // Выключаем экран результатов, включаем экран свидания
+        if (gameOverScreenUI != null) gameOverScreenUI.SetActive(false);
+        if (dateScreenUI != null) dateScreenUI.SetActive(true);
     }
 
     void HideTimerText()
     {
         if (timerTextLegacy != null && timerTextLegacy.gameObject != null)
-        {
             timerTextLegacy.gameObject.SetActive(false);
-        }
         else if (timerTextTMP != null && timerTextTMP.gameObject != null)
-        {
             timerTextTMP.gameObject.SetActive(false);
-        }
     }
 
     public void GameOver()
     {
         if (isGameOver) return;
-
-        isGameOver = true;
-        Time.timeScale = 0f;
-
-        if (backgroundSource != null && backgroundSource.isPlaying) backgroundSource.Stop();
-        if (radioSource != null && radioSource.isPlaying) radioSource.Stop();
-
-        HideTimerText();
-
-        if (gameOverScreenUI != null)
-        {
-            gameOverScreenUI.SetActive(true);
-
-            float currentAccuracy = 0f;
-            if (texturePainter != null)
-            {
-                texturePainter.TransferTextureToFinalScreen(finalHandsImage);
-                currentAccuracy = texturePainter.GetSuccessPercentage();
-            }
-            StartCoroutine(AnimateDiagram(currentAccuracy));
-        }
+        FinishGame();
     }
 
     public void RestartGame()
