@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -40,13 +41,13 @@ public class GameManager : MonoBehaviour
     [Header("Элементы Финала и Свиданий")]
     [Tooltip("Порог процентов для победы (например, 70)")]
     public float requiredSuccessPercent = 70f;
-    public Button goToDateButton; // Вторая кнопка ("На свидание")
-    public TMP_Text winLoseText; // Текст "Ура вы выиграли" / "Увы вы не успели"
+    public Button goToDateButton;
+    public TMP_Text winLoseText;
 
     [Header("Экран Свидания (Новая логика)")]
-    public GameObject dateScreenUI; // Экран свидания, который включается кнопкой
-    public Image finalDateCandidateImage; // Компонент Image на экране свидания, куда встанет мужичок
-    public Sprite[] manSprites; // Массив из 5 картинок красивых мужчин
+    public GameObject dateScreenUI;
+    public Image finalDateCandidateImage;
+    public Sprite[] manSprites; // Твой массив картинок
 
     void Start()
     {
@@ -64,7 +65,6 @@ public class GameManager : MonoBehaviour
         if (dateScreenUI != null)
             dateScreenUI.SetActive(false);
 
-        // Изначально кнопка свидания отключена и текст пустой
         if (goToDateButton != null) goToDateButton.interactable = false;
         if (winLoseText != null) winLoseText.text = "";
 
@@ -211,21 +211,69 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // МЕТОД ДЛЯ КНОПКИ "НА СВИДАНИЕ" (Выбирает мужичка сам!)
+    // УМНАЯ ЛОГИКА С ПАМЯТЬЮ УСТРОЙСТВА
     public void OpenDateScreen()
     {
-        if (manSprites != null && manSprites.Length > 0 && finalDateCandidateImage != null)
+        if (finalDateCandidateImage != null && manSprites != null && manSprites.Length > 0)
         {
-            // Сама программа выбирает случайный индекс от 0 до длины массива
-            int randomIndex = Random.Range(0, manSprites.Length);
+            // 1. Собираем список индексов, которые еще НЕ показывали
+            List<int> allowedIndices = new List<int>();
+            for (int i = 0; i < manSprites.Length; i++)
+            {
+                // Если в PlayerPrefs нет ключа "Shown_Мальчик", значит он свободен
+                if (!PlayerPrefs.HasKey("ShownMan_" + i))
+                {
+                    allowedIndices.Add(i);
+                }
+            }
 
-            // Подставляем выбранную картинку на экран свидания
-            finalDateCandidateImage.sprite = manSprites[randomIndex];
+            // 2. Если все мужички уже кончились, сбрасываем историю и собираем заново
+            if (allowedIndices.Count == 0)
+            {
+                ClearManHistory();
+                for (int i = 0; i < manSprites.Length; i++)
+                {
+                    allowedIndices.Add(i);
+                }
+            }
+
+            // Дополнительная защита: если остался всего 1 доступный мужичок, 
+            // проверяем, чтобы он не совпал с тем, кто выпал прямо перед перезапуском
+            if (allowedIndices.Count == manSprites.Length && PlayerPrefs.HasKey("LastShownMan"))
+            {
+                int lastShown = PlayerPrefs.GetInt("LastShownMan");
+                if (allowedIndices.Contains(lastShown) && allowedIndices.Count > 1)
+                {
+                    allowedIndices.Remove(lastShown); // Убираем прошлого из пула первого хода
+                }
+            }
+
+            // 3. Выбираем случайного парня из разрешенных
+            int randomChoice = Random.Range(0, allowedIndices.Count);
+            int chosenManIndex = allowedIndices[randomChoice];
+
+            // 4. Показываем его на экране
+            finalDateCandidateImage.sprite = manSprites[chosenManIndex];
+
+            // 5. Запоминаем, что этот мужик уже использован, и сохраняем его как "последнего"
+            PlayerPrefs.SetInt("ShownMan_" + chosenManIndex, 1);
+            PlayerPrefs.SetInt("LastShownMan", chosenManIndex);
+            PlayerPrefs.Save();
         }
 
-        // Выключаем экран результатов, включаем экран свидания
         if (gameOverScreenUI != null) gameOverScreenUI.SetActive(false);
         if (dateScreenUI != null) dateScreenUI.SetActive(true);
+    }
+
+    // Вспомогательный метод для очистки памяти
+    private void ClearManHistory()
+    {
+        if (manSprites == null) return;
+        for (int i = 0; i < manSprites.Length; i++)
+        {
+            PlayerPrefs.DeleteKey("ShownMan_" + i);
+        }
+        PlayerPrefs.Save();
     }
 
     void HideTimerText()

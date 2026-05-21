@@ -5300,7 +5300,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -116866264, y: -52167300}
+  m_AnchoredPosition: {x: -116866220, y: -52167280}
   m_SizeDelta: {x: 1205.1763, y: 565.73047}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1811509126
@@ -5521,7 +5521,7 @@ MonoBehaviour:
   finalHandsImage: {fileID: 1822609080}
   diagramFillImage: {fileID: 1704470486}
   percentTextUI: {fileID: 86181268}
-  requiredSuccessPercent: 10
+  requiredSuccessPercent: 70
   goToDateButton: {fileID: 433304595}
   winLoseText: {fileID: 890725437}
   dateScreenUI: {fileID: 1792924193}
@@ -5532,9 +5532,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: a108ec04170f05c4bb7a21e05f492764, type: 3}
   - {fileID: 21300000, guid: 0c6cc19a381f81f4fa59bf52e9ca3b5b, type: 3}
   - {fileID: 21300000, guid: c81aa3b5c0932d94289b3eebb513dfb8, type: 3}
-  - {fileID: 21300000, guid: c81aa3b5c0932d94289b3eebb513dfb8, type: 3}
-  - {fileID: 21300000, guid: c81aa3b5c0932d94289b3eebb513dfb8, type: 3}
-  - {fileID: 21300000, guid: c81aa3b5c0932d94289b3eebb513dfb8, type: 3}
+  - {fileID: 21300000, guid: 661ff9fbf44432941b9dcb9e98f4e9ef, type: 3}
+  - {fileID: 21300000, guid: 658abfdee30438245ac96330ed6f46ed, type: 3}
+  - {fileID: 21300000, guid: f4e10e68fd9ea9a44b35bf7a5c767747, type: 3}
 --- !u!4 &1941025719
 Transform:
   m_ObjectHideFlags: 0
